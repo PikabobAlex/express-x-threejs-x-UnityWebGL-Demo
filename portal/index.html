@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Unity WebGL Player | SlingShooter</title>
+  </head>
+  <body style="text-align: center; padding: 0; border: 0; margin: 0">
+    <canvas id="unity-canvas" width="960" height="600" style="width: 960px; height: 600px; background: #231f20"></canvas>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="/Build/Build.loader.js"></script>
+    <script>
+      var socket = io();
+
+      var meta = document.createElement("meta");
+      meta.name = "viewport";
+      meta.content = "width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes";
+      document.getElementsByTagName("head")[0].appendChild(meta);
+
+      var canvas = document.querySelector("#unity-canvas");
+      canvas.style.width = "100";
+      canvas.style.height = "auto";
+      canvas.style.position = "fixed";
+
+      document.body.style.textAlign = "left";
+
+      function emitScore(data) {
+        socket.emit("game scored", data);
+      }
+
+      createUnityInstance(document.querySelector("#unity-canvas"), {
+        dataUrl: "Build/Build.data.unityweb",
+        frameworkUrl: "Build/Build.framework.js.unityweb",
+        codeUrl: "Build/Build.wasm.unityweb",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "DefaultCompany",
+        productName: "SlingShooter",
+        productVersion: "1.0",
+        // matchWebGLToCanvasSize: false, // Uncomment this to separately control WebGL canvas render size and DOM element size.
+        // devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
+      }).then((instance) => {
+        socket.on("game launch", function (msg) {
+          instance.SendMessage(
+            "gameMaster",
+            "launchRocket",
+            `{\"socketID\": \"${msg.socketID}\",\"userName\": \"${msg.userName}\", \"launchForce\": ${msg.launchForce} ,\"launchAngle\": \"${msg.launchAngle}\"}`
+          );
+        });
+      });
+    </script>
+  </body>
+</html>

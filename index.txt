@@ -1,0 +1,46 @@
+const express = require("express");
+const app = express();
+const http = require("https");
+const fs = require("fs");
+const compression = require("compression");
+const path = require("path");
+
+const options = {
+  key: fs.readFileSync("localhost/key.pem"),
+  cert: fs.readFileSync("localhost/cert.pem"),
+};
+
+const server = http.createServer(options, app);
+const { Server } = require("socket.io");
+const io = new Server(server);
+
+const ConnectionList = [];
+
+app.use("/Build", express.static("admin/Build"));
+
+app.get("/display_portal", (req, res) => {
+  res.sendFile(__dirname + "/portal/index.html");
+});
+
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/client/index.html");
+});
+
+io.on("connection", (socket) => {
+  console.log(socket);
+  if (socket.handshake.headers.referer.includes("display_portal")) console.log("display portal connected");
+  else console.log("a user connected");
+
+  socket.on("disconnect", (e) => {
+    if (socket.handshake.headers.referer.includes("display_portal")) console.log("Display Portal disconnected");
+    else console.log("a user disconnected");
+  });
+
+  socket.on("launch", (msg) => {
+    io.emit("rocket launch", msg);
+  });
+});
+
+server.listen(3000, "0.0.0.0", () => {
+  console.log("Example app listening on port 3000!");
+});

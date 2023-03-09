@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Socket.IO Client</title>
+    <style>
+      html,
+      body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      body .container {
+        height: 100%;
+        width: 100%;
+        max-width: 375px;
+        max-height: 667px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .launchButton {
+        height: 100px;
+        width: 100px;
+        background-color: red;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+
+      .register {
+        /* display: none; */
+        position: fixed;
+        top: 0%;
+        left: 0%;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .register .container {
+        height: 72px;
+        width: 150px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background-color: antiquewhite;
+        border-radius: 2px;
+        border: 1px solid #ccc;
+      }
+
+      .register form {
+        display: grid;
+        grid-template-rows: 1fr 1fr;
+        gap: 10px;
+        justify-items: center;
+      }
+
+      .register .submit {
+        border: none;
+        background-color: rgb(0, 162, 250);
+        border-radius: 10rem;
+        padding: 0.5rem 0;
+        width: 5rem;
+        color: white;
+      }
+      .register .name {
+        border: none;
+        border-radius: 10rem;
+        text-align: center;
+      }
+
+      .slider-container {
+        position: relative;
+        width: 200px;
+        height: 300px;
+        margin: 20px;
+      }
+
+      .slider {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 20px;
+        background: #ddd;
+        outline: none;
+        opacity: 0.7;
+        -webkit-transition: 0.2s;
+        transition: opacity 0.2s;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        transform: translateY(100%);
+        transform-origin: bottom;
+      }
+
+      .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #007bff;
+        cursor: pointer;
+      }
+
+      .slider::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: #007bff;
+        cursor: pointer;
+      }
+
+      .slider-label {
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 14px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="slider-container">
+        <input type="range" min="-90" max="90" value="0" class="slider" id="angle-slider" />
+      </div>
+      <div class="launchButton"></div>
+    </div>
+    <div class="register">
+      <div class="container">
+        <form name="Register">
+          <input class="name" type="text" name="name" />
+          <input class="submit" type="submit" />
+        </form>
+      </div>
+    </div>
+  </body>
+  <script type="importmap">
+    {
+      "imports": {
+        "socket.io-client": "https://cdn.socket.io/4.4.1/socket.io.esm.min.js"
+      }
+    }
+  </script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script type="module">
+    // Register form
+    import { io } from "socket.io-client";
+    const register = document.querySelector(".register");
+    const form = document.forms["Register"];
+    const name = form.elements["name"];
+    $.ajax({
+      url: "https://randomuser.me/api/",
+      dataType: "json",
+      success: function (data) {
+        name.value = data.results[0].name.first + " " + data.results[0].name.last;
+      },
+    });
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      console.log(name.value);
+      if (name.value.length === 0) {
+        console.log("Please enter a name");
+        return;
+      }
+      const socket = io();
+      socket.on("connect", () => {
+        socket.on(socket.id + " connected", () => {
+          console.log(socket.id + "is connected");
+          socket.emit("client register", name.value);
+          register.style.display = "none";
+          const button = document.querySelector(".launchButton");
+          let inputTimeout,
+            ready = true;
+          button.addEventListener("click", function (e) {
+            if (ready) {
+              const angleSlider = document.querySelector("#angle-slider");
+              const angle = angleSlider.value;
+              console.log(angle);
+
+              socket.emit("client launch", { socketID: socket.id, userName: name.value, launchForce: 1.5, launchAngle: angle });
+              ready = false;
+              inputTimeout = setTimeout(() => {
+                ready = true;
+              }, 1500);
+            }
+          });
+        });
+      });
+    });
+  </script>
+</html>

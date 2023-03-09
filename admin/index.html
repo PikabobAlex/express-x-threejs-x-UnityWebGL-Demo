@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin</title>
+    <style>
+      :root {
+        font-family: monospace;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 20px;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 8px;
+        border: 1px solid #ddd;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      tr:nth-child(even) {
+        background-color: #f2f2f2;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- create a ul -->
+    <!-- <ul id="players"></ul> -->
+    <table>
+      <thead>
+        <tr>
+          <th>User ID</th>
+          <th>User Name</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody id="players">
+        <!-- <tr>
+          <td>1</td>
+          <td>John Smith</td>
+          <td>95</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Jane Doe</td>
+          <td>87</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Bob Johnson</td>
+          <td>72</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Alice Brown</td>
+          <td>91</td>
+        </tr> -->
+      </tbody>
+    </table>
+    <script type="importmap">
+      {
+        "imports": {
+          "socket.io-client": "https://cdn.socket.io/4.4.1/socket.io.esm.min.js"
+        }
+      }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="module">
+      import { io } from "socket.io-client";
+      const socket = io();
+
+      setInterval(() => {
+        socket.emit("server sync playerlist");
+      }, 1000);
+
+      socket.on("admin sync playerlist", (data) => {
+        $("#players").html("");
+        for (const player of data) {
+          // $("#players").append(`<li>${player.name} ${player.id} ${player.score}</li>`);
+          // in tbody format
+          $("#players").append(`<tr><td>${player.userName}</td><td>${player.socketID}</td><td>${player.score}</td></tr>`);
+        }
+      });
+    </script>
+  </body>
+</html>
