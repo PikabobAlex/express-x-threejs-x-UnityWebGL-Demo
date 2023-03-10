@@ -22,7 +22,7 @@ const options = {
 };
 
 const app = express();
-const server = http.createServer(options, app);
+const server = http.createServer(app);
 const io = new Server(server);
 
 const ConnectionList: IConnection[] = [];
