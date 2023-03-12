@@ -37,6 +37,7 @@
           <th>User ID</th>
           <th>User Name</th>
           <th>Score</th>
+          <th>Options</th>
         </tr>
       </thead>
       <tbody id="players">
@@ -83,7 +84,39 @@
         for (const player of data) {
           // $("#players").append(`<li>${player.name} ${player.id} ${player.score}</li>`);
           // in tbody format
-          $("#players").append(`<tr><td>${player.userName}</td><td>${player.socketID}</td><td>${player.score}</td></tr>`);
+
+          const tr = document.createElement("tr");
+          const td_username = document.createElement("td");
+          const td_socketID = document.createElement("td");
+          const td_score = document.createElement("td");
+          const td_button = document.createElement("td");
+
+          const button = document.createElement("button");
+          button.setAttribute("data-socketID", player.socketID);
+          button.innerHTML = "Send Notification";
+
+          td_username.innerHTML = player.userName;
+          td_socketID.innerHTML = player.socketID;
+          td_score.innerHTML = player.score;
+
+          td_button.appendChild(button);
+
+          tr.appendChild(td_username);
+          tr.appendChild(td_socketID);
+          tr.appendChild(td_score);
+          tr.appendChild(td_button);
+
+          $("#players").append(tr);
+
+          button.addEventListener("click", (e) => {
+            console.log(e.target.getAttribute("data-socketID"));
+            socket.emit("admin send notification", {
+              socketID: e.target.getAttribute("data-socketID"),
+              message: "Hello from admin",
+            });
+          });
+
+          // $("#players").append(`<tr><td>${player.userName}</td><td>${player.socketID}</td><td>${player.score}</td><td><button data-socketID="${player.socketID}">Send Notification</button></td></tr>`);
         }
       });
     </script>

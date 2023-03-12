@@ -22,18 +22,20 @@ const options = {
 };
 
 const app = express();
-const server = http.createServer(app);
+const server = http.createServer(options, app);
 const io = new Server(server);
 
 const ConnectionList: IConnection[] = [];
 
-app.use("/Build", express.static(__dirname + "\\portal\\Build"));
-console.log(__dirname + "/portal/Build");
+// Setup public directory for static files of Portal folder.
+app.use("/Build", express.static(__dirname + "/portal/Build"));
+app.use("/assets", express.static(__dirname + "/client/assets"));
 
 app.get("/display", (req: any, res: any) => {
     res.sendFile(__dirname + "/portal/index.html");
 });
-// console.log(__dirname + "\\..\\client\\index.html");
+
+
 
 app.get("/", (req: any, res: any) => {
     res.sendFile(__dirname + "/client/index.html");
@@ -67,6 +69,9 @@ io.on("connection", (socket: Socket) => {
             return;
         };
         ConnectionList[connectionIndex].score += info.score;
+
+        io.emit("server scored " + ConnectionList[connectionIndex].socketID, ConnectionList[connectionIndex].score);
+
         console.log(ConnectionList[connectionIndex].userName + " scored " + info.score + " points");
     });
 
@@ -92,9 +97,16 @@ io.on("connection", (socket: Socket) => {
         io.emit("admin sync playerlist", ConnectionList);
     });
 
+    interface IAdminNotification {
+        message: string;
+        socketID: string;
+    }
 
+    socket.on("admin send notification", (msg: IAdminNotification) => {
+        io.emit('server message ' + msg.socketID, msg.message);
+    });
 });
 
-server.listen(3000, "0.0.0.0", () => {
+server.listen(3000, "localhost", () => {
     console.log("Server listening on port 3000");
 });

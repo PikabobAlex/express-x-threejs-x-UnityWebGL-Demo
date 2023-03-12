@@ -1,0 +1,113 @@
+html,
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+body > .container {
+  height: 100%;
+  width: 100%;
+  max-width: 375px;
+  max-height: 667px;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: center;
+  align-items: center;
+  .launchButton {
+    height: 100px;
+    width: 100px;
+    background-color: red;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  .slider-container {
+    position: relative;
+    width: 200px;
+    margin: 20px;
+    .slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 20px;
+      background: #ddd;
+      outline: none;
+      opacity: 0.7;
+      -webkit-transition: 0.2s;
+      transition: opacity 0.2s;
+      // position: absolute;
+      // bottom: 0;
+      // left: 0;
+      // transform: translateY(100%);
+      // transform-origin: bottom;
+      &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #007bff;
+        cursor: pointer;
+      }
+      &::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: #007bff;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.register {
+  /* display: none; */
+  position: fixed;
+  top: 0%;
+  left: 0%;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .container {
+    height: 72px;
+    width: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background-color: antiquewhite;
+    border-radius: 2px;
+    border: 1px solid #ccc;
+
+    #form {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 10px;
+      justify-items: center;
+      .submit {
+        border: none;
+        background-color: rgb(0, 162, 250);
+        border-radius: 10rem;
+        padding: 0.5rem 0;
+        width: 5rem;
+        color: white;
+      }
+      .name {
+        border: none;
+        border-radius: 10rem;
+        text-align: center;
+      }
+    }
+  }
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
