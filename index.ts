@@ -107,6 +107,6 @@ io.on("connection", (socket: Socket) => {
     });
 });
 
-server.listen(3000, "localhost", () => {
+server.listen(3000, "0.0.0.0", () => {
     console.log("Server listening on port 3000");
 });
